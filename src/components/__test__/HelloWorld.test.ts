@@ -1,20 +1,30 @@
-import { shallowMount } from '@vue/test-utils';
 import HelloWorld from '../HelloWorld.vue';
-import { expect, it } from 'vitest';
+import { render, screen } from '../../../vitest-setup';
 
-it('Hello', async () => {
-  const wrapper = shallowMount(HelloWorld, {
-    propsData: {
-      msg: 'Hello world',
-    },
+describe('Hello', async () => {
+  it('renders the component', async () => {
+    render(HelloWorld, {
+      props: {
+        msg: 'This is a test message',
+      },
+    });
+
+    await screen.findByText('This is a test message');
   });
 
-  const button = wrapper.find("[data-test='counter-button']");
+  it('has a working counter', async () => {
+    const { testUser } = render(HelloWorld, {
+      props: {
+        msg: '',
+      },
+    });
 
-  expect(button.exists()).toBe(true);
-  expect(button.text()).toContain(0);
+    const button = await screen.findByTestId('counter-button');
 
-  await button.trigger('click');
+    expect(button).toHaveTextContent('0');
 
-  expect(button.text()).toContain(1);
+    await testUser.click(button);
+
+    expect(button).toHaveTextContent('1');
+  });
 });
